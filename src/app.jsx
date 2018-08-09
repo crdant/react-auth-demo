@@ -1,29 +1,47 @@
-var ExampleApplication = React.createClass({
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+
+class ExampleApplication extends Component {
+
+  constructor(props) {
+    super(props)
+    console.log(process.env.VCAP_SERVICES)
+    console.log(process.env.VCAP_APPLICATION)
+    if ( process.env.VCAP_SERVICES && process.env.VCAP_APPLICATION) {
+      let vcap_services = JSON.parse(process.env.VCAP_SERVICES) ;
+      let vcap_application = JSON.parse(process.env.VCAP_APPLICATION) ;
+
+      if ( ( vcap_services["p-identity"]) && ( vcap_services["p-identity"][0] ) && ( vcap_services["p-identity"][0].credentials ) ) {
+        this.ssoServiceUrl = vcap_services["p-identity"][0].credentials.auth_domain;
+        this.clientId = vcap_services["p-identity"][0].credentials.client_id ;
+        this.authDomain = vcap_services["p-identity"][0].credentials.auth_domain ;
+        this.baseUrl = vcap_application && vcap_application.uris && ("https://" + vcap_application.uris[0] + "/") ;
+      }
+    } else {
+      this.clientId = "client_id_placeholder"
+    }
+  }
+
   getFragment(pattern) {
     var matcher = new RegExp(pattern + "=([^&]+)");
     var result = matcher.exec(window.location.hash);
     if (result) {
       return result[1];
     }
-  },
+  }
 
   prettyToken(token) {
     return JSON.stringify(JSON.parse(atob(token.split('\.')[1])), null, '  ');
-  },
-
+  }
 
   constructUaaRedirect() {
-    var ssoServiceUrl = document.getElementById("ssoServiceUrl").content;
-    var clientId = document.getElementById("clientId").content;
-    var thisUrl = document.getElementById("thisUrl").content;
-    return `${ssoServiceUrl}/oauth/authorize?client_id=${clientId}&response_type=token+id_token&redirect_uri=${thisUrl}implicit.html#uaaLocation=${ssoServiceUrl}`
-  },
+    return `${this.ssoServiceUrl}/oauth/authorize?client_id=${this.clientId}&response_type=token+id_token&redirect_uri=${this.baseUrl}implicit#uaaLocation=${this.ssoServiceUrl}`
+  }
 
   render() {
     var page = null;
-    var clientId = document.getElementById("clientId").content;
     if (window.location.pathname === "/") {
-      if (clientId === "client_id_placeholder") {
+      if (this.clientId === "client_id_placeholder") {
         page = (
           <div>
             <h1>Warning: You need to bind to the SSO service.</h1>
@@ -43,20 +61,19 @@ var ExampleApplication = React.createClass({
         </div>)
       }
     }
-    if (window.location.pathname === "/implicit.html") {
-      var ssoServiceUrl = document.getElementById("ssoServiceUrl").content;
+    if (window.location.pathname === "/implicit") {
       var expiresIn = this.getFragment("expires_in");
       var scope = this.getFragment("scope");
       var jti = this.getFragment("jti");
       var idToken = this.prettyToken(this.getFragment("id_token"));
       var token = this.prettyToken(this.getFragment("access_token"));
       var tokenType = this.getFragment("token_type");
-      var profileUrl = ssoServiceUrl + '/profile';
+      var profileUrl = this.ssoServiceUrl + '/profile';
       const urlStr = window.location.protocol + '//' + window.location.host;
-      var logoutUrl = ssoServiceUrl + '/logout.do' + '?redirect=' + urlStr + '&client_id=' + clientId;
+      var logoutUrl = this.ssoServiceUrl + '/logout.do' + '?redirect=' + urlStr + '&client_id=' + this.clientId;
       page = (<div>
         <h1>Implicit sample</h1>
-        <p>The server only saw a request for /implicit.html. Everything after the # in the address bar is stuff that only your browser can see.</p>
+        <p>The server only saw a request for /implicit. Everything after the # in the address bar is stuff that only your browser can see.</p>
         <p>Your ID Token token is:</p>
         <pre id="id_token">{idToken}</pre>
         <p>Expires in:</p>
@@ -84,7 +101,7 @@ var ExampleApplication = React.createClass({
     }
     return page;
   }
-});
+}
 
 ReactDOM.render(<ExampleApplication />, document.getElementById('root'));
 

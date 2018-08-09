@@ -8,3 +8,5 @@ applications:
   - demo1
   env:
     GRANT_TYPE: implicit
+    SSO_SCOPES: openid
+    SSO_REDIRECT_URIS: https://react-auth-demo.homelab.fynesy.com/implicit
