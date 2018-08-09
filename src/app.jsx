@@ -12,11 +12,13 @@ class ExampleApplication extends Component {
       let vcap_application = JSON.parse(process.env.VCAP_APPLICATION) ;
 
       if ( ( vcap_services["p-identity"]) && ( vcap_services["p-identity"][0] ) && ( vcap_services["p-identity"][0].credentials ) ) {
+        this.baseUrl = vcap_application && vcap_application.uris && (window.location.protocol + "//" + vcap_application.uris[0]);
+        console.log(this.baseUrl)
         this.ssoServiceUrl = vcap_services["p-identity"][0].credentials.auth_domain;
         this.signon = new JSO({
           providerID: "pivotal",
           client_id: vcap_services["p-identity"][0].credentials.client_id ,
-          redirect_uri: vcap_application && vcap_application.uris && ("https://" + vcap_application.uris[0] + "/implicit"),
+          redirect_uri: this.baseUrl + "/implicit",
           authorization: this.ssoServiceUrl + "/oauth/authorize",
           scopes: { request: ["openid"] }
         });
@@ -41,6 +43,14 @@ class ExampleApplication extends Component {
 
   prettyToken(token) {
     return JSON.stringify(JSON.parse(atob(token.split('\.')[1])), null, '  ');
+  }
+
+  componentWillMount() {
+    if (window.location.pathname === "/logout") {
+      this.signon.wipeTokens()
+      let logoutUrl = this.ssoServiceUrl + '/logout.do' + '?redirect=' + encodeURI(this.baseUrl) + '&client_id=' + this.clientId;
+      window.location = logoutUrl
+    }
   }
 
   componentDidMount() {
@@ -86,9 +96,8 @@ class ExampleApplication extends Component {
 
       if ( isLoaded ) {
           var profileUrl = this.ssoServiceUrl + '/profile';
-          const urlStr = window.location.protocol + '//' + window.location.host;
-          var logoutUrl = this.ssoServiceUrl + '/logout.do' + '?redirect=' + urlStr + '&client_id=' + this.clientId;
-          var productsUrl = "/products"
+          let productsPath = "/products"
+          let logoutPath = "/logout"
 
           page = (<div>
             <h1>Implicit sample</h1>
@@ -98,13 +107,13 @@ class ExampleApplication extends Component {
             <h2>What do you want to do?</h2>
             <ul>
               <li>
-                <a id="profile" target="uaa" href={productsUrl}>Use the token to call a service</a>
+                <a id="profile" target="uaa" href={productsPath}>Use the token to call a service</a>
               </li>
               <li>
                 <a id="profile" target="uaa" href={profileUrl}>See your account profile on UAA (so you can de-authorize this client)</a>
               </li>
               <li>
-                <a id="logout" href={logoutUrl}>Log out of UAA</a>
+                <a id="logout" href={logoutPath}>Log out of UAA</a>
               </li>
             </ul>
           </div>);
@@ -116,8 +125,12 @@ class ExampleApplication extends Component {
     }
 
     if ( window.location.pathname == "/products") {
-      var serviceUrl = "https://core-cf-webapi-comedic-eland.homelab.fynesy.com"
+      var serviceUrl = process.env.PRODUCT_SERVICE_URL
       page = ( <div>Product component here</div> ) ;
+    }
+
+    if ( window.location.pathname == "/logout") {
+      page = ( <div>Logging out...</div> )
     }
 
     console.log("returning page")
