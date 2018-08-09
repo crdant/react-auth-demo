@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "Simple Cloud Foundry authentication demo in react",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "cf push --no-start -b nodejs_buildpack && cf v3-push -b nodejs_buildpack -b staticfile_buildpack $npm_package_name",
+    "undeploy": "cf delete $npm_package_name",
+    "refresh": "cf restart $npm_package_name"
   },
   "repository": {
     "type": "git",

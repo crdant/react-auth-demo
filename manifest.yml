@@ -1,0 +1,10 @@
+applications:
+- name: react-auth-demo
+  disk_quota: 1G
+  instances: 1
+  memory: 512M
+  services:
+  - gatsbyjs-config-server
+  - demo1
+  env:
+    GRANT_TYPE: implicit
