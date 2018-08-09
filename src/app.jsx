@@ -1,19 +1,22 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { JSO, Popup } from 'jso';
+import { JSO } from 'jso';
+
+import Products from './components/products.jsx'
 
 class ExampleApplication extends Component {
 
   constructor(props) {
     super(props)
-
+    console.log("in the constructor")
+    console.log(process.env)
     if ( process.env.VCAP_SERVICES && process.env.VCAP_APPLICATION) {
       let vcap_services = JSON.parse(process.env.VCAP_SERVICES) ;
       let vcap_application = JSON.parse(process.env.VCAP_APPLICATION) ;
 
       if ( ( vcap_services["p-identity"]) && ( vcap_services["p-identity"][0] ) && ( vcap_services["p-identity"][0].credentials ) ) {
+        console.log("construcing with variables")
         this.baseUrl = vcap_application && vcap_application.uris && (window.location.protocol + "//" + vcap_application.uris[0]);
-        console.log(this.baseUrl)
         this.ssoServiceUrl = vcap_services["p-identity"][0].credentials.auth_domain;
         this.signon = new JSO({
           providerID: "pivotal",
@@ -23,6 +26,7 @@ class ExampleApplication extends Component {
           scopes: { request: ["openid"] }
         });
       } else {
+        console.log("construcing with no variables")
         this.clientId = "client_id_placeholder";
       }
     }
@@ -107,7 +111,7 @@ class ExampleApplication extends Component {
             <h2>What do you want to do?</h2>
             <ul>
               <li>
-                <a id="profile" target="uaa" href={productsPath}>Use the token to call a service</a>
+                <a id="profile" href={productsPath}>Use the token to call a service</a>
               </li>
               <li>
                 <a id="profile" target="uaa" href={profileUrl}>See your account profile on UAA (so you can de-authorize this client)</a>
@@ -125,8 +129,8 @@ class ExampleApplication extends Component {
     }
 
     if ( window.location.pathname == "/products") {
-      var serviceUrl = process.env.PRODUCT_SERVICE_URL
-      page = ( <div>Product component here</div> ) ;
+      var productServiceUrl = process.env.PRODUCT_SERVICE_URL
+      page = ( <Products auth={this.signon} serviceUrl={productServiceUrl}/> ) ;
     }
 
     if ( window.location.pathname == "/logout") {

@@ -10,3 +10,4 @@ applications:
     GRANT_TYPE: implicit
     SSO_SCOPES: openid
     SSO_REDIRECT_URIS: https://react-auth-demo.homelab.fynesy.com/implicit
+    PRODUCT_SERVICE_URL: https://core-cf-webapi-brash-hippopotamus.homelab.fynesy.com/api/products

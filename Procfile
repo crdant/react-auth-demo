@@ -1,1 +1,1 @@
-web: export PATH=$HOME/app/node_modules/.bin:$HOME/deps/0/bin:${PATH} && echo "VCAP_SERVICES='$(echo $VCAP_SERVICES | tr -d '\n')'" > .env && echo "VCAP_APPLICATION='$(echo $VCAP_APPLICATION | tr -d '\n')'" >> .env && npm run build && $HOME/boot.sh
+web: export PATH=$HOME/app/node_modules/.bin:$HOME/deps/0/bin:${PATH} && echo "VCAP_SERVICES='$(echo $VCAP_SERVICES | tr -d '\n')'" > .env && echo "VCAP_APPLICATION='$(echo $VCAP_APPLICATION | tr -d '\n')'" >> .env && echo "PRODUCT_SERVICE_URL=${PRODUCT_SERVICE_URL}" >> .env && npm run build && $HOME/boot.sh
