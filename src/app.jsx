@@ -87,3 +87,5 @@ var ExampleApplication = React.createClass({
 });
 
 ReactDOM.render(<ExampleApplication />, document.getElementById('root'));
+
+module.hot.accept();
