@@ -7,7 +7,14 @@ module.exports = () => {
 
   // reduce it to a nice object, the same as before
   const envKeys = Object.keys(env).reduce((prev, next) => {
-    prev[`process.env.${next}`] = JSON.stringify(env[next]);
+    if ( next === "VCAP_SERVICES" ) {
+      let vcap_services = JSON.parse(env[next]) ;
+      exposed_services = {};
+      exposed_services["p-identity"] = vcap_services["p-identity"];
+      prev[`process.env.${next}`] = JSON.stringify(JSON.stringify(exposed_services));
+    } else {
+      prev[`process.env.${next}`] = JSON.stringify(env[next]);
+    }
     return prev;
   }, {});
 
