@@ -1,3 +1,2 @@
-root: dist
 force_https: true
 pushstate: enabled

@@ -5,7 +5,7 @@ node_modules/
 .npm
 
 # webpack output
-dist/
+public/
 
 # local environment
 .env
