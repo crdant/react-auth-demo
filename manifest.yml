@@ -4,7 +4,7 @@ applications:
   instances: 1
   memory: 512M
   services:
-  - gatsbyjs-config-server
+  - config-server
   - demo1
   env:
     GRANT_TYPE: implicit
