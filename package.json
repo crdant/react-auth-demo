@@ -38,7 +38,7 @@
     "css-loader": "^1.0.0",
     "dotenv": "^6.0.0",
     "html-webpack-plugin": "^3.2.0",
-    "jso": "^4.1.0",
+    "jso": "^4.1.1",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-id-swiper": "^1.6.6",
